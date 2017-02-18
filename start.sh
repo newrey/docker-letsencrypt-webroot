@@ -23,31 +23,36 @@ exp_limit="${EXP_LIMIT:-30}"
 check_freq="${CHECK_FREQ:-30}"
 
 le_hook() {
-    all_links=($(env | grep -oP '^[0-9A-Z_-]+(?=_ENV_LE_RENEW_HOOK)'))
-    compose_links=($(env | grep -oP '^[0-9A-Z]+_[a-zA-Z0-9_.-]+_[0-9]+(?=_ENV_LE_RENEW_HOOK)'))
-    
-    except_links=($(
-        for link in ${compose_links[@]}; do
-            compose_project=$(echo $link | cut -f1 -d"_")
-            compose_name=$(echo $link | cut -f2- -d"_" | sed 's/_[^_]*$//g')
-            compose_instance=$(echo $link | grep -o '[^_]*$')
-            echo ${compose_name}_${compose_instance}
-            echo ${compose_name}
-        done
-    ))
-    
-    containers=($(
-        for link in ${all_links[@]}; do
-            [[ " ${except_links[@]} " =~ " ${link} " ]] || echo $link
-        done
-    ))
-    
-    for container in ${containers[@]}; do
-        command=$(eval echo \$${container}_ENV_LE_RENEW_HOOK)
-        command=$(echo $command | sed "s/@CONTAINER_NAME@/${container,,}/g")
-        echo "[INFO] Run: $command"
-        eval $command
-    done
+#    all_links=($(env | grep -oP '^[0-9A-Z_-]+(?=_ENV_LE_RENEW_HOOK)'))
+#    compose_links=($(env | grep -oP '^[0-9A-Z]+_[a-zA-Z0-9_.-]+_[0-9]+(?=_ENV_LE_RENEW_HOOK)'))
+
+#    except_links=($(
+#        for link in ${compose_links[@]}; do
+#            compose_project=$(echo $link | cut -f1 -d"_")
+#            compose_name=$(echo $link | cut -f2- -d"_" | sed 's/_[^_]*$//g')
+#            compose_instance=$(echo $link | grep -o '[^_]*$')
+#            echo ${compose_name}_${compose_instance}
+#            echo ${compose_name}
+#        done
+#    ))
+
+#    containers=($(
+#        for link in ${all_links[@]}; do
+#            [[ " ${except_links[@]} " =~ " ${link} " ]] || echo $link
+#        done
+#    ))
+
+#    for container in ${containers[@]}; do
+#        command=$(eval echo \$${container}_ENV_LE_RENEW_HOOK)
+#        command=$(echo $command | sed "s/@CONTAINER_NAME@/${container,,}/g")
+#        echo "[INFO] Run: $command"
+#        eval $command
+#    done
+        if [ "$LE_RENEW_HOOK" ] ; then
+            command=${LE_RENEW_HOOK}
+            echo "{INFO} Run: $command"
+            eval $command
+        fi
 }
 
 le_fixpermissions() {
