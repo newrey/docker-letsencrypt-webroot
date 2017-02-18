@@ -67,7 +67,9 @@ This is example of letsencrypt-webroot with nginx configuration:
 nginx:
   restart: always
   image: nginx
-  hostname: example.com
+  ## important!!!
+  container_name: nginx-container-name
+  hostname: example.com
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./nginx:/etc/nginx:ro
@@ -81,7 +83,7 @@ nginx:
 
 letsencrypt:
   restart: always
-  image: kvaps/letsencrypt-webroot
+  image: newrey/letsencrypt-webroot
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - /var/run/docker.sock:/var/run/docker.sock
@@ -95,6 +97,8 @@ letsencrypt:
     - WEBROOT_PATH=/tmp/letsencrypt
     - EXP_LIMIT=30
     - CHECK_FREQ=30
+    ## important!!! nginx-container-name defined at service nginx
+    - LE_RENEW_HOOK_SELF=docker kill -s HUP nginx-container-name
 ```
 
 ## Once run
